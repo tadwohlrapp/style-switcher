@@ -66,15 +66,24 @@ export class MapboxStyleSwitcherControl implements IControl {
     this.mapStyleContainer = document.createElement('div')
     this.styleButton = document.createElement('button')
     this.styleButton.type = 'button'
+    this.styleButton.ariaLabel = 'Switch Map Style'
+    this.styleButton.ariaHasPopup = 'menu'
+    this.styleButton.ariaExpanded = 'false'
     this.mapStyleContainer.classList.add('mapboxgl-style-list')
+    this.mapStyleContainer.role = 'menu'
+    this.mapStyleContainer.ariaLabel = 'Map Style Options'
     for (const style of this.styles) {
       const styleElement = document.createElement('button')
       styleElement.type = 'button'
+      styleElement.ariaLabel = `Switch Map Style to ${style.title}`
+      styleElement.role = 'menuitemradio'
+      styleElement.ariaChecked = 'false'
       styleElement.innerText = style.title
       styleElement.classList.add(style.title.replace(/[^a-z0-9-]/gi, '_'))
       styleElement.dataset.uri = JSON.stringify(style.uri)
       styleElement.addEventListener('click', (event) => {
         const srcElement = event.target as HTMLButtonElement
+        srcElement.ariaChecked = 'true'
         this.closeModal()
         if (srcElement.classList.contains('active')) {
           return
@@ -89,6 +98,7 @@ export class MapboxStyleSwitcherControl implements IControl {
         this.map!.setStyle(style.uri)
         const elms = this.mapStyleContainer!.getElementsByClassName('active')
         while (elms[0]) {
+          elms[0].ariaChecked = 'false'
           elms[0].classList.remove('active')
         }
         srcElement.classList.add('active')
@@ -101,6 +111,7 @@ export class MapboxStyleSwitcherControl implements IControl {
         }
       })
       if (style.title === this.defaultStyle) {
+        styleElement.ariaChecked = 'true'
         styleElement.classList.add('active')
       }
       this.mapStyleContainer.appendChild(styleElement)
@@ -140,6 +151,7 @@ export class MapboxStyleSwitcherControl implements IControl {
     if (this.mapStyleContainer && this.styleButton) {
       this.mapStyleContainer.style.display = 'none'
       this.styleButton.style.display = 'block'
+      this.styleButton.ariaExpanded = 'false'
     }
   }
 
@@ -147,6 +159,7 @@ export class MapboxStyleSwitcherControl implements IControl {
     if (this.mapStyleContainer && this.styleButton) {
       this.mapStyleContainer.style.display = 'block'
       this.styleButton.style.display = 'none'
+      this.styleButton.ariaExpanded = 'true'
     }
   }
 
